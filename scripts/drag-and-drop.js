@@ -44,7 +44,9 @@ angular.module('ngDragDrop', [])
 
         element.bind('dragstart', function (e) {
           $rootScope.dragSource = object;
-          onDrag($rootScope.dragSource);
+          if (angular.isFunction(onDrag)) {
+            onDrag($rootScope.dragSource);
+          }
           element.addClass(dragClass);
         });
 
@@ -67,9 +69,9 @@ angular.module('ngDragDrop', [])
             return;
           }
 
-          scope.enteredTimes += 1;
-          //scope.safeApply();
-          scope.$apply();
+          scope.$apply(function() {
+            scope.enteredTimes += 1;
+          });
 
         });
 
@@ -78,9 +80,9 @@ angular.module('ngDragDrop', [])
             return;
           }
 
-          scope.enteredTimes -= 1;
-          //scope.safeApply();
-          scope.$apply();
+          scope.$apply(function() {
+            scope.enteredTimes -= 1;
+          });
         });
 
         element.bind('drop', function (e) {
@@ -92,10 +94,14 @@ angular.module('ngDragDrop', [])
             e.stopPropagation(); // Necessary. Allows us to drop.
           }
 
-          scope.enteredTimes -= 1;
+          scope.$apply(function() {
+            scope.enteredTimes -= 1;
+          });
 
           // only call the callback function if we get valid target
-          onDrop($rootScope.dragSource, object);
+          if (angular.isFunction(onDrop)) {
+            onDrop($rootScope.dragSource, object);
+          }
 
         });
 
